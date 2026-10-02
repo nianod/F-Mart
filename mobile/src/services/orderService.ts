@@ -1,5 +1,6 @@
 import api from "./api";
-export type Order = { _id: string; foodName: string; quantity: number; address: string; urgent: boolean; temperature: "warm" | "cold"; notes: string; status: string; createdAt: string; user?: { name: string }; deliveryGuy?: { name: string } };
+export type OrderStatus = "pending" | "accepted" | "preparing" | "ready" | "out_for_delivery" | "delivered" | "cancelled";
+export type Order = { _id: string; foodName: string; quantity: number; address: string; urgent: boolean; temperature: "warm" | "cold"; notes: string; status: OrderStatus; createdAt: string; updatedAt?: string; statusHistory?: { status: OrderStatus; at: string }[]; user?: { name: string; email?: string; phone?: string }; deliveryGuy?: { name: string; email?: string; phone?: string } };
 export const createOrder = (payload: Omit<Order, "_id" | "status" | "createdAt" | "user" | "deliveryGuy">) => api.post("/orders", payload).then((r) => r.data.data.order as Order);
 export const getMyOrders = () => api.get("/orders/my-orders").then((r) => r.data.data.orders as Order[]);
 export const getAvailableOrders = () => api.get("/orders/available").then((r) => r.data.data.orders as Order[]);
