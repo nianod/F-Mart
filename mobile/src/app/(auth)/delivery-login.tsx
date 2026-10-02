@@ -6,9 +6,26 @@ import { Button, Input } from "@/components/foodmart/ui";
 import { login, readableError } from "@/services/authService";
 import { useAuth } from "@/services/authContext";
 export default function DeliveryLoginScreen() {
-  const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(process.env.EXPO_PUBLIC_DELIVERY_EMAIL || "delivery@example.com");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { setAuthenticatedUser } = useAuth();
-  const submit = async () => { if (!email || !password) return Alert.alert("Missing details", "Enter your email and password."); try { setLoading(true); const session = await login({ email, password }); if (session.user.role !== "delivery") return Alert.alert("Delivery account required", "This account is not registered as a delivery partner."); await setAuthenticatedUser(session.token, session.user); router.replace("/(delivery)/home" as never); } catch (error) { Alert.alert("Login failed", readableError(error)); } finally { setLoading(false); } };
+  const submit = async () => {
+    if (!email.trim() || !password) return Alert.alert("Missing details", "Enter your email and password.");
+    try {
+      setLoading(true);
+      const session = await login({ email: email.trim().toLowerCase(), password });
+      if (session.user.role !== "delivery") {
+        return Alert.alert("Delivery account required", "This account is not registered as a delivery partner.");
+      }
+      await setAuthenticatedUser(session.token, session.user);
+      router.replace("/(delivery)/home" as never);
+    } catch (error) {
+      Alert.alert("Login failed", readableError(error));
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <SafeAreaView className="flex-1 bg-ink">
       <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 48, gap: 20 }}>
@@ -21,7 +38,7 @@ export default function DeliveryLoginScreen() {
         <View className="mt-10 gap-5 rounded-3xl bg-cream p-5">
           <Input
             label="Email"
-            placeholder="driver@foodmart.com"
+            placeholder="delivery@example.com"
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
