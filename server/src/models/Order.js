@@ -12,6 +12,10 @@ const orderSchema = new mongoose.Schema(
     temperature: { type: String, enum: ["warm", "cold"], default: "warm" },
     notes: { type: String, trim: true, maxlength: 1000, default: "" },
     status: { type: String, enum: ORDER_STATUSES, default: "pending" },
+    statusHistory: {
+      type: [{ status: { type: String, enum: ORDER_STATUSES, required: true }, at: { type: Date, default: Date.now } }],
+      default: [],
+    },
     deliveryGuy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true },
